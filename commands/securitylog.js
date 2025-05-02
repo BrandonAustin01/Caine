@@ -1,21 +1,39 @@
+const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
-const securityLogPath = path.join(__dirname, '../logs/security.log');
 const { isRateLimited } = require('../utils/rateLimiter');
 
+const securityLogPath = path.join(__dirname, '../logs/security.log');
+
 module.exports = {
-  name: 'securitylog',
-  description: 'View or clear the security log.',
-  async execute(message, args) {
-    if (!message.member.permissions.has('Administrator')) {
-      return message.reply('❌ You must be an admin to use this command.');
+  data: new SlashCommandBuilder()
+    .setName('securitylog')
+    .setDescription('View or clear the security log.')
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    .addSubcommand(sub =>
+      sub.setName('last')
+        .setDescription('Show the last few security log entries')
+        .addIntegerOption(option =>
+          option.setName('count')
+            .setDescription('How many entries to show (default: 10)')
+            .setMinValue(1)
+            .setMaxValue(50)
+        )
+    )
+    .addSubcommand(sub =>
+      sub.setName('clear')
+        .setDescription('Clear the security log')
+    ),
+
+  async execute(interaction) {
+    if (isRateLimited(interaction.user.id, 5000)) {
+      return interaction.reply({ content: '⏳ Slow down! Try again shortly.', ephemeral: true });
     }
 
-    const sub = args[0]?.toLowerCase();
+    const subcommand = interaction.options.getSubcommand();
 
-    // Show last X entries
-    if (sub === 'last') {
-      const count = parseInt(args[1]) || 10;
+    if (subcommand === 'last') {
+      const count = interaction.options.getInteger('count') || 10;
 
       try {
         const data = fs.readFileSync(securityLogPath, 'utf8');
@@ -23,31 +41,25 @@ module.exports = {
         const lastLines = lines.slice(-count);
 
         if (lastLines.length === 0) {
-          return message.reply('🔍 Security log is currently empty.');
+          return interaction.reply('🔍 Security log is currently empty.');
         }
 
         const formatted = lastLines.map(line => `• ${line}`).join('\n');
-
-        await message.reply(`🛡️ Last ${lastLines.length} security events:\n\`\`\`\n${formatted}\n\`\`\``);
+        return interaction.reply(`🛡️ Last ${lastLines.length} security events:\n\`\`\`\n${formatted}\n\`\`\``);
       } catch (err) {
         console.error(err);
-        return message.reply('⚠️ Failed to read the security log.');
+        return interaction.reply('⚠️ Failed to read the security log.');
       }
     }
 
-    // Clear log (with confirmation)
-    else if (sub === 'clear') {
+    if (subcommand === 'clear') {
       try {
         fs.writeFileSync(securityLogPath, '', 'utf8');
-        return message.reply('🧹 Security log has been cleared.');
+        return interaction.reply('🧹 Security log has been cleared.');
       } catch (err) {
         console.error(err);
-        return message.reply('❌ Failed to clear the security log.');
+        return interaction.reply('❌ Failed to clear the security log.');
       }
-    }
-
-    else {
-      return message.reply('Usage:\n• `!securitylog last [count]`\n• `!securitylog clear`');
     }
   }
 };

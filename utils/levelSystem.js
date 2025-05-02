@@ -1,11 +1,23 @@
 const fs = require('fs');
 const path = require('path');
-const config = require('../config/config.json');
-
 const xpPath = path.join(__dirname, '../data/xp.json');
-if (!fs.existsSync(xpPath)) fs.writeFileSync(xpPath, '{}', 'utf8');
 
-let xpData = JSON.parse(fs.readFileSync(xpPath, 'utf8'));
+let xpData = {};
+try {
+  const raw = fs.readFileSync(xpPath, 'utf8');
+  xpData = raw ? JSON.parse(raw) : {};
+} catch (err) {
+  console.error('⚠️ Failed to load xp.json in levelSystem.js:', err);
+  xpData = {};
+}
+
+let config = {};
+try {
+  config = require('../config/config.json');
+} catch (err) {
+  console.warn('⚠️ Could not load rank role config.');
+}
+
 
 // Level formula: basic square root scaling
 function getLevelFromXp(xp) {
