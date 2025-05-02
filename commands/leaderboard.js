@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
+const requireRankingEnabled = require('../utils/requireRankingEnabled');
 
 const xpPath = path.join(__dirname, '../data/xp.json');
 
@@ -21,6 +22,8 @@ module.exports = {
     .setDescription('View the top 10 ranked users in this server.'),
 
   async execute(interaction) {
+    if (!requireRankingEnabled(interaction)) return;
+
     const guildId = interaction.guild.id;
 
     if (!xpData[guildId]) {

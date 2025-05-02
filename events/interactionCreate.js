@@ -2,15 +2,30 @@ const fs = require('fs');
 const path = require('path');
 const sendConfigPanel = require('../utils/sendConfigPanel');
 
-
 const {
   ActionRowBuilder,
   ModalBuilder,
   TextInputBuilder,
-  TextInputStyle,
-  EmbedBuilder,
-  StringSelectMenuBuilder
+  TextInputStyle
 } = require('discord.js');
+
+const {
+  buildAntiRaidEmbed,
+  buildSpamFilterEmbed,
+  buildRankingEmbed
+} = require('../utils/buildConfigEmbed');
+
+const {
+  buildMaxJoinsModal,
+  buildSpamIntervalModal,
+  buildSpamMaxModal,
+  buildRaidIntervalModal
+} = require('../utils/buildConfigModals');
+
+const {
+  buildPunishmentSelect,
+  buildModlogChannelSelect
+} = require('../utils/buildConfigSelects');
 
 const configPath = path.join(__dirname, '../config/config.json');
 
@@ -28,36 +43,6 @@ function saveConfig(newConfig) {
 function getConfig() {
   delete require.cache[require.resolve(configPath)];
   return require(configPath);
-}
-
-function buildAntiRaidEmbed(antiRaid) {
-  return new EmbedBuilder()
-    .setTitle('🛡️ Anti-Raid Settings')
-    .setDescription('Live configuration panel for Cain\'s auto-raid protection.\nUse the buttons below to adjust values.')
-    .setColor(antiRaid.enabled ? 0x4caf50 : 0xf44336)
-    .addFields(
-      { name: '📌 Enabled', value: antiRaid.enabled ? '`✅ Yes`' : '`❌ No`', inline: true },
-      { name: '👥 Max Joins', value: `\`${antiRaid.maxJoins}\` users`, inline: true },
-      { name: '⏱️ Time Window', value: `\`${antiRaid.intervalMs / 1000}s\``, inline: true },
-      { name: '🚨 Punishment', value: `\`${antiRaid.punishment.toUpperCase()}\``, inline: true }
-    )
-    .setFooter({ text: 'Cain Security Panel • v1.0' })
-    .setTimestamp();
-}
-
-function buildSpamFilterEmbed(spamFilter) {
-  return new EmbedBuilder()
-    .setTitle('🧹 Spam Filter Settings')
-    .setDescription('Live configuration panel for Cain’s message spam detection.')
-    .setColor(spamFilter.enabled ? 0x4caf50 : 0xf44336)
-    .addFields(
-      { name: '📌 Enabled', value: spamFilter.enabled ? '`✅ Yes`' : '`❌ No`', inline: true },
-      { name: '💬 Max Messages', value: `\`${spamFilter.maxMessages}\``, inline: true },
-      { name: '⏱️ Interval', value: `\`${spamFilter.intervalMs / 1000}s\``, inline: true },
-      { name: '⚖️ Punishment', value: `\`${spamFilter.punishment.toUpperCase()}\``, inline: true }
-    )
-    .setFooter({ text: 'Cain Security Panel • v1.0' })
-    .setTimestamp();
 }
 
 module.exports = async (client, interaction) => {
@@ -92,72 +77,25 @@ module.exports = async (client, interaction) => {
     }
 
     if (interaction.customId === 'set_modlog_channel') {
-        const channels = interaction.guild.channels.cache
-          .filter(c => c.isTextBased() && c.type === 0) // Type 0 = GuildText
-          .map(c => ({
-            label: `#${c.name}`,
-            value: c.id
-          }))
-          .slice(0, 25); // Discord max options
-      
-        const menu = new StringSelectMenuBuilder()
-          .setCustomId('select_modlog_channel')
-          .setPlaceholder('Select a mod-log channel')
-          .addOptions(channels);
-      
-        return interaction.reply({
-          content: 'Choose a channel to use for mod-logs:',
-          components: [new ActionRowBuilder().addComponents(menu)],
-          ephemeral: true
-        });
-      }      
+      return interaction.reply({
+        content: 'Choose a channel to use for mod-logs:',
+        components: [buildModlogChannelSelect(interaction.guild)],
+        ephemeral: true
+      });
+    }
 
     if (interaction.customId === 'set_maxJoins') {
-      const modal = new ModalBuilder()
-        .setCustomId('modal_maxJoins')
-        .setTitle('Set Max Joins')
-        .addComponents(
-          new ActionRowBuilder().addComponents(
-            new TextInputBuilder()
-              .setCustomId('value')
-              .setLabel('Max joins in interval')
-              .setStyle(TextInputStyle.Short)
-              .setRequired(true)
-              .setPlaceholder('e.g., 5')
-          )
-        );
-      return interaction.showModal(modal);
+      return interaction.showModal(buildMaxJoinsModal());
     }
 
     if (interaction.customId === 'set_interval') {
-      const modal = new ModalBuilder()
-        .setCustomId('modal_interval')
-        .setTitle('Set Interval in Seconds')
-        .addComponents(
-          new ActionRowBuilder().addComponents(
-            new TextInputBuilder()
-              .setCustomId('value')
-              .setLabel('Time window (seconds)')
-              .setStyle(TextInputStyle.Short)
-              .setRequired(true)
-              .setPlaceholder('e.g., 10')
-          )
-        );
-      return interaction.showModal(modal);
+      return interaction.showModal(buildRaidIntervalModal());
     }
 
     if (interaction.customId === 'set_punishment') {
-      const select = new StringSelectMenuBuilder()
-        .setCustomId('select_punishment')
-        .setPlaceholder('Select punishment')
-        .addOptions([
-          { label: 'Kick', value: 'kick' },
-          { label: 'Ban', value: 'ban' }
-        ]);
-
       return interaction.reply({
         content: 'Select a punishment method:',
-        components: [new ActionRowBuilder().addComponents(select)],
+        components: [buildPunishmentSelect('select_punishment')],
         ephemeral: true
       });
     }
@@ -174,58 +112,46 @@ module.exports = async (client, interaction) => {
       return confirmInteraction(interaction, 'Spam Filter Enabled', config.spamFilter.enabled ? 'Yes' : 'No');
     }
 
+    if (interaction.customId === 'toggle_ranking') {
+      config.rankingSystem.enabled = !config.rankingSystem.enabled;
+      saveConfig(config);
+
+      const updatedEmbeds = [
+        buildAntiRaidEmbed(config.antiRaid),
+        buildSpamFilterEmbed(config.spamFilter),
+        buildRankingEmbed(config.rankingSystem, config.rankRoles)
+      ];
+
+      await interaction.update({
+        embeds: updatedEmbeds,
+        components: interaction.message.components
+      });
+
+      return confirmInteraction(
+        interaction,
+        'Ranking System Enabled',
+        config.rankingSystem.enabled ? 'Yes' : 'No'
+      );
+    }
+
     if (interaction.customId === 'set_spam_max') {
-      const modal = new ModalBuilder()
-        .setCustomId('modal_spam_max')
-        .setTitle('Set Max Messages')
-        .addComponents(
-          new ActionRowBuilder().addComponents(
-            new TextInputBuilder()
-              .setCustomId('value')
-              .setLabel('Max messages in interval')
-              .setStyle(TextInputStyle.Short)
-              .setRequired(true)
-              .setPlaceholder('e.g., 5')
-          )
-        );
-      return interaction.showModal(modal);
+      return interaction.showModal(buildSpamMaxModal());
     }
 
     if (interaction.customId === 'set_spam_interval') {
-      const modal = new ModalBuilder()
-        .setCustomId('modal_spam_interval')
-        .setTitle('Set Spam Interval (sec)')
-        .addComponents(
-          new ActionRowBuilder().addComponents(
-            new TextInputBuilder()
-              .setCustomId('value')
-              .setLabel('Interval in seconds')
-              .setStyle(TextInputStyle.Short)
-              .setRequired(true)
-              .setPlaceholder('e.g., 10')
-          )
-        );
-      return interaction.showModal(modal);
+      return interaction.showModal(buildSpamIntervalModal());
     }
 
     if (interaction.customId === 'set_spam_punishment') {
-      const select = new StringSelectMenuBuilder()
-        .setCustomId('select_spam_punishment')
-        .setPlaceholder('Select punishment')
-        .addOptions([
-          { label: 'Kick', value: 'kick' },
-          { label: 'Mute', value: 'mute' }
-        ]);
-
       return interaction.reply({
         content: 'Select a spam punishment method:',
-        components: [new ActionRowBuilder().addComponents(select)],
+        components: [buildPunishmentSelect('select_spam_punishment', true)],
         ephemeral: true
       });
     }
 
     if (interaction.customId === 'open_config_panel') {
-        return sendConfigPanel(interaction);
+      return sendConfigPanel(interaction);
     }
   }
 
@@ -283,18 +209,17 @@ module.exports = async (client, interaction) => {
 
   if (interaction.isStringSelectMenu()) {
     if (interaction.customId === 'select_modlog_channel') {
-        const config = getConfig();
-        const selectedId = interaction.values[0];
-      
-        config.modLogChannel = selectedId;
-        saveConfig(config);
-      
-        return interaction.update({
-          content: `✅ Mod-log channel set to <#${selectedId}>`,
-          components: []
-        });
+      const config = getConfig();
+      const selectedId = interaction.values[0];
+
+      config.modLogChannel = selectedId;
+      saveConfig(config);
+
+      return interaction.update({
+        content: `✅ Mod-log channel set to <#${selectedId}>`,
+        components: []
+      });
     }
-      
 
     if (interaction.customId === 'select_punishment') {
       config.antiRaid.punishment = interaction.values[0];
