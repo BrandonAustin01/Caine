@@ -1,0 +1,32 @@
+# Node.js dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# Log files
+logs/
+*.log
+
+# OS / Editor junk
+.DS_Store
+Thumbs.db
+*.swp
+
+# VSCode settings
+.vscode/
+
+# Package lock files (optional – if you prefer clean installs)
+package-lock.json
+
+# Security config
+config/config.json
+
+# Optional: Build or dist folders if you ever compile
+dist/
+build/
+
+# Optional: backup or temp files
+*.bak
+*.tmp
+*.old
