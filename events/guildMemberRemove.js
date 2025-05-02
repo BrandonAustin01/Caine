@@ -1,15 +1,15 @@
 const securityLog = require('../utils/securityLogger');
 const logger = require('../utils/logger');
 const detectKickAbuse = require('../security/kickDetector');
-
+const { AuditLogEvent } = require('discord.js');
 
 module.exports = async (client, member) => {
   try {
     const { guild, user } = member;
 
-    // Fetch recent kick entries
+    // ✅ Correct numeric audit type
     const fetchedLogs = await guild.fetchAuditLogs({
-      type: 'MEMBER_KICK',
+      type: AuditLogEvent.MemberKick,
       limit: 5
     });
 
@@ -20,7 +20,7 @@ module.exports = async (client, member) => {
 
     if (!logEntry) {
       logger.info(`👋 ${user.tag} left ${guild.name} (not a kick)`);
-      return; // User left voluntarily
+      return;
     }
 
     const moderator = logEntry.executor?.tag || 'Unknown';
@@ -30,7 +30,7 @@ module.exports = async (client, member) => {
     logger.warn(message);
     securityLog.log(message);
 
-    // Detect abuse
+    // Call kick abuse detector
     detectKickAbuse(guild.id, user, moderator);
   } catch (err) {
     logger.error('❌ Failed to check kick logs:', err);
