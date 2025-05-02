@@ -47,7 +47,8 @@ const {
       new ButtonBuilder().setCustomId('set_spam_max').setLabel('Max Messages').setStyle(ButtonStyle.Primary),
       new ButtonBuilder().setCustomId('set_spam_interval').setLabel('Interval').setStyle(ButtonStyle.Primary),
       new ButtonBuilder().setCustomId('set_spam_punishment').setLabel('Punishment').setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder().setCustomId('set_spam_cooldown').setLabel('Cooldown').setStyle(ButtonStyle.Secondary)
+      new ButtonBuilder().setCustomId('set_spam_cooldown').setLabel('Cooldown').setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder().setCustomId('set_modlog_channel').setLabel('Set Mod-Log').setStyle(ButtonStyle.Secondary)
     );
   
     return interaction.reply({

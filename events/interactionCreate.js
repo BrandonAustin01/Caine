@@ -91,6 +91,27 @@ module.exports = async (client, interaction) => {
       return confirmInteraction(interaction, 'Anti-Raid Enabled', config.antiRaid.enabled ? 'Yes' : 'No');
     }
 
+    if (interaction.customId === 'set_modlog_channel') {
+        const channels = interaction.guild.channels.cache
+          .filter(c => c.isTextBased() && c.type === 0) // Type 0 = GuildText
+          .map(c => ({
+            label: `#${c.name}`,
+            value: c.id
+          }))
+          .slice(0, 25); // Discord max options
+      
+        const menu = new StringSelectMenuBuilder()
+          .setCustomId('select_modlog_channel')
+          .setPlaceholder('Select a mod-log channel')
+          .addOptions(channels);
+      
+        return interaction.reply({
+          content: 'Choose a channel to use for mod-logs:',
+          components: [new ActionRowBuilder().addComponents(menu)],
+          ephemeral: true
+        });
+      }      
+
     if (interaction.customId === 'set_maxJoins') {
       const modal = new ModalBuilder()
         .setCustomId('modal_maxJoins')
@@ -261,6 +282,20 @@ module.exports = async (client, interaction) => {
   }
 
   if (interaction.isStringSelectMenu()) {
+    if (interaction.customId === 'select_modlog_channel') {
+        const config = getConfig();
+        const selectedId = interaction.values[0];
+      
+        config.modLogChannel = selectedId;
+        saveConfig(config);
+      
+        return interaction.update({
+          content: `✅ Mod-log channel set to <#${selectedId}>`,
+          components: []
+        });
+    }
+      
+
     if (interaction.customId === 'select_punishment') {
       config.antiRaid.punishment = interaction.values[0];
       saveConfig(config);

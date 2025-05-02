@@ -1,5 +1,3 @@
-// commands/config.js
-
 const {
   SlashCommandBuilder,
   EmbedBuilder,

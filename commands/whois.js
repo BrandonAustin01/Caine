@@ -1,51 +1,51 @@
-const { EmbedBuilder, time, PermissionsBitField } = require('discord.js');
-const { isRateLimited } = require('../utils/rateLimiter');
+// commands/whois.js
+
+const {
+  SlashCommandBuilder,
+  EmbedBuilder,
+  time,
+  PermissionFlagsBits
+} = require('discord.js');
+
+const config = require('../config/config.json');
+const securityLog = require('../utils/securityLogger');
 
 module.exports = {
-  name: 'whois',
-  description: 'Fetch detailed info about a user (by mention or ID).',
-  async execute(message, args) {
-    if (!message.member.permissions.has('Administrator')) {
-      return message.reply('❌ You must be an admin to use this command.');
-    }
+  data: new SlashCommandBuilder()
+    .setName('whois')
+    .setDescription('Fetch detailed info about a user.')
+    .addUserOption(option =>
+      option.setName('user')
+        .setDescription('The user to lookup')
+        .setRequired(true)
+    )
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
-    const input = args[0];
-    if (!input) return message.reply('Usage: `!whois <@user | userID>`');
-
-    const userId = input.replace(/[<@!>]/g, '');
-    let user, member, banned = false;
-
-    try {
-      user = await message.client.users.fetch(userId);
-    } catch {
-      return message.reply('❌ Could not fetch that user.');
-    }
+  async execute(interaction) {
+    const user = interaction.options.getUser('user');
+    let member = null;
+    let banned = false;
 
     try {
-      member = await message.guild.members.fetch(user.id);
-    } catch {
-      member = null;
-    }
+      member = await interaction.guild.members.fetch(user.id).catch(() => null);
+    } catch {}
 
     try {
-      const banInfo = await message.guild.bans.fetch(user.id);
+      const banInfo = await interaction.guild.bans.fetch(user.id).catch(() => null);
       banned = !!banInfo;
-    } catch {
-      banned = false;
-    }
+    } catch {}
+
+    const isMuted = member?.roles.cache.some(r => r.name.toLowerCase().includes('muted')) || false;
+    const highestRole = member?.roles.highest.name || 'N/A';
 
     const roles = member
       ? member.roles.cache
-          .filter(r => r.id !== message.guild.id)
+          .filter(r => r.id !== interaction.guild.id)
           .map(r => `<@&${r.id}>`)
           .slice(0, 15)
           .join(', ') || 'None'
       : 'Not in server';
 
-    const isMuted = member?.roles.cache.some(r => r.name.toLowerCase().includes('muted')) || false;
-    const highestRole = member?.roles.highest.name || 'N/A';
-
-    // Permissions preview
     const perms = member?.permissions?.toArray().slice(0, 5).join(', ') || 'N/A';
 
     const embed = new EmbedBuilder()
@@ -71,6 +71,17 @@ module.exports = {
       );
     }
 
-    return message.reply({ embeds: [embed] });
+    // ✅ Send to mod-log channel if configured
+    const modlogId = config.modLogChannel;
+    const modlog = modlogId ? interaction.guild.channels.cache.get(modlogId) : null;
+
+    if (modlog && modlog.isTextBased()) {
+      await modlog.send({ embeds: [embed] });
+    }
+
+    // ✅ Internal security log
+    securityLog.log(`📋 Whois lookup on ${user.tag} (${user.id}) by ${interaction.user.tag}`);
+
+    return interaction.reply({ embeds: [embed], flags: 1 << 6 }); // ✅ Ephemeral to moderator
   }
 };
