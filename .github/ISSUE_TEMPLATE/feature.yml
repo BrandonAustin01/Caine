@@ -1,5 +1,6 @@
 name: "✨ Feature Request"
 description: "Propose a feature or enhancement for Cain."
+title: "[FEATURE] "
 labels: [enhancement, suggestion]
 body:
   - type: markdown
@@ -27,8 +28,6 @@ body:
     attributes:
       label: Feature Description
       description: "What should it do? What commands/settings would be added?"
-      validations:
-      required: false
 
   - type: checkboxes
     id: considerations
