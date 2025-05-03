@@ -81,10 +81,16 @@ node index.js
 
 ```json
 "rankRoles": {
+  "3": "📘 Newbie",
   "5": "🟢 Rookie",
   "10": "🔵 Member",
+  "15": "🟣 Contributor",
   "20": "🟡 Veteran",
-  "50": "💠 Champion"
+  "30": "🔴 Elite",
+  "40": "⚪ Expert",
+  "50": "💠 Champion",
+  "60": "🔥 Legend",
+  "75": "👑 Master"
 }
 ```
 
