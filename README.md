@@ -1,4 +1,4 @@
-## README.md
+![Caine Logo Final-01](https://github.com/user-attachments/assets/16005504-35ce-48c8-b5c0-ac98947155f0)
 
 <h1 align="center">🛡️ Caine — The Guardian of Your Discord</h1>
 
