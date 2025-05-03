@@ -109,6 +109,7 @@ We welcome all improvements, big or small. Please see [CONTRIBUTING.md](CONTRIBU
 
 Need help or want to contribute to Caine's mission?
 
+* 📖 See the full Wiki: [CaineBot Wiki](https://github.com/BrandonAustin01/cain/wiki)
 * 🛠️ [Join the Caine Community Server](https://discord.gg/3fzCgEHYqU)
 * 📬 Feature requests and bug reports are welcome in [GitHub Issues](https://github.com/BrandonAustin01/Caine/issues)
 * 💡 PRs should target the `main` branch after local testing
