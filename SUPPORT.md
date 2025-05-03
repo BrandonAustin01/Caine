@@ -1,12 +1,12 @@
-# 🙋 Support for Cain
+# 🙋 Support for Caine
 
-Need help setting up or using Cain? We’ve got your back.
+Need help setting up or using Caine? We’ve got your back.
 
 ---
 
 ## 💬 Join the Community
 
-Get live help, share feedback, or report bugs directly in the Cain Community Discord:
+Get live help, share feedback, or report bugs directly in the Caine Community Discord:
 
 🔗 **[Join Now](https://discord.gg/3fzCgEHYqU)**
 
@@ -22,7 +22,7 @@ Get live help, share feedback, or report bugs directly in the Cain Community Dis
 
 ## 🛠️ Bug Reports / Feature Requests
 
-Please use the [Issues tab](https://github.com/BrandonAustin01/cain/issues) on GitHub.
+Please use the [Issues tab](https://github.com/BrandonAustin01/Caine/issues) on GitHub.
 
 - 🐛 Found a bug? Use the `🐛 Bug Report` template.
 - ✨ Got an idea? Use the `✨ Feature Request` template.
@@ -36,4 +36,4 @@ If you have a security concern, please email:
 
 ---
 
-> Cain is built by the community, for the community. Your support keeps it sharp.
+> Caine is built by the community, for the community. Your support keeps it sharp.

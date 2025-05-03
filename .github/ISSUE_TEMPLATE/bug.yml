@@ -1,5 +1,5 @@
 name: "🐛 Bug Report"
-description: "Something isn't working right in Cain. Help us squash it!"
+description: "Something isn't working right in Caine. Help us squash it!"
 labels: [bug, needs-triage]
 body:
   - type: markdown
@@ -19,7 +19,7 @@ body:
     id: expected
     attributes:
       label: Expected Behavior
-      description: "What did you expect Cain to do?"
+      description: "What did you expect Caine to do?"
     validations:
       required: true
 
@@ -27,7 +27,7 @@ body:
     id: actual
     attributes:
       label: Actual Behavior
-      description: "What did Cain do instead?"
+      description: "What did Caine do instead?"
     validations:
       required: true
 

@@ -1,11 +1,11 @@
 ## README.md
 
-<h1 align="center">🛡️ Cain — The Guardian of Your Discord</h1>
+<h1 align="center">🛡️ Caine — The Guardian of Your Discord</h1>
 
 <p align="center">
-  <b>Cain</b> is a modular, security-first Discord bot designed for communities that demand stability, control, and customizability.
+  <b>Caine</b> is a modular, security-first Discord bot designed for communities that demand stability, control, and customizability.
   <br><br>
-  <img alt="License" src="https://img.shields.io/github/license/BrandonAustin01/cain?style=flat-square">
+  <img alt="License" src="https://img.shields.io/github/license/BrandonAustin01/Caine?style=flat-square">
   <img alt="Built With" src="https://img.shields.io/badge/Built%20With-Node.js%20%7C%20Discord.js-blue?style=flat-square">
   <img alt="Status" src="https://img.shields.io/badge/status-under%20active%20development-yellow?style=flat-square">
 </p>
@@ -41,8 +41,8 @@ discord-bot/
 ### 🧰 Setup
 
 ```bash
-git clone https://github.com/BrandonAustin01/cain.git
-cd cain
+git clone https://github.com/BrandonAustin01/Caine.git
+cd Caine
 npm install
 ```
 
@@ -107,10 +107,10 @@ We welcome all improvements, big or small. Please see [CONTRIBUTING.md](CONTRIBU
 
 ### 💬 Support & Feedback
 
-Need help or want to contribute to Cain's mission?
+Need help or want to contribute to Caine's mission?
 
-* 🛠️ [Join the Cain Community Server](https://discord.gg/3fzCgEHYqU)
-* 📬 Feature requests and bug reports are welcome in [GitHub Issues](https://github.com/BrandonAustin01/cain/issues)
+* 🛠️ [Join the Caine Community Server](https://discord.gg/3fzCgEHYqU)
+* 📬 Feature requests and bug reports are welcome in [GitHub Issues](https://github.com/BrandonAustin01/Caine/issues)
 * 💡 PRs should target the `main` branch after local testing
 
-Thanks for being part of the Cain initiative.
+Thanks for being part of the Caine initiative.
