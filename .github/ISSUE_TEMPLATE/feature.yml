@@ -1,0 +1,40 @@
+name: "✨ Feature Request"
+description: "Propose a feature or enhancement for Cain."
+labels: [enhancement, suggestion]
+body:
+  - type: markdown
+    attributes:
+      value: "We're always open to ways Cain can get stronger!"
+
+  - type: input
+    id: summary
+    attributes:
+      label: Feature Summary
+      placeholder: "Add mute command, Improve /leaderboard, etc."
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Why is this needed?
+      description: "How would this help Cain or its users?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Feature Description
+      description: "What should it do? What commands/settings would be added?"
+      validations:
+      required: false
+
+  - type: checkboxes
+    id: considerations
+    attributes:
+      label: Related Considerations
+      options:
+        - label: It should respect admin-only permissions
+        - label: It must support ephemeral replies
+        - label: It could impact existing config options

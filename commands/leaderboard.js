@@ -26,24 +26,27 @@ module.exports = {
 
     const guildId = interaction.guild.id;
 
-    if (!xpData[guildId]) {
+    const guildXp = xpData[guildId];
+    if (!guildXp || Object.keys(guildXp).length === 0) {
       return interaction.reply({
-        content: '❌ No leaderboard data available for this server.',
+        content: '📉 No leaderboard data yet. Start chatting to gain XP!',
         ephemeral: true
       });
     }
 
-    const users = Object.entries(xpData[guildId])
+    const sorted = Object.entries(guildXp)
       .map(([userId, data]) => ({ userId, xp: data.xp, level: data.level }))
       .sort((a, b) => b.xp - a.xp)
       .slice(0, 10);
 
-    const leaderboard = await Promise.all(users.map(async (entry, index) => {
-      const member = await interaction.guild.members.fetch(entry.userId).catch(() => null);
-      const tag = member?.user?.tag || `User Left (${entry.userId})`;
-      const emoji = rankEmojis[index] || `#${index + 1}`;
-      return `${emoji} **${tag}** — Level ${entry.level}, ${entry.xp} XP`;
-    }));
+    const leaderboard = await Promise.all(
+      sorted.map(async ({ userId, xp, level }, index) => {
+        const member = await interaction.guild.members.fetch(userId).catch(() => null);
+        const tag = member?.user?.tag || `👤 Unknown (${userId})`;
+        const emoji = rankEmojis[index] || `#${index + 1}`;
+        return `${emoji} **${tag}** — Level \`${level}\` • \`${xp} XP\``;
+      })
+    );
 
     const embed = new EmbedBuilder()
       .setTitle('🏆 Cain Leaderboard — Top 10')

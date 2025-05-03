@@ -1,0 +1,57 @@
+name: "🐛 Bug Report"
+description: "Something isn't working right in Cain. Help us squash it!"
+labels: [bug, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please provide a clear and detailed explanation of the issue you're experiencing.
+
+  - type: input
+    id: environment
+    attributes:
+      label: Runtime Environment
+      placeholder: "Node.js v18.16, Discord.js v14.13"
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: "What did you expect Cain to do?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: "What did Cain do instead?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction Steps
+      description: "How can we recreate this bug?"
+      placeholder: "1. Run `/rank view`\n2. Bot crashes"
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs / Stack Trace
+      description: "Paste any logs, errors, or stack traces here."
+      render: shell
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - ❗ High (breaking)
+        - ⚠️ Medium (limited impact)
+        - 🐞 Low (minor)
