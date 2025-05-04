@@ -21,5 +21,5 @@ function isRateLimited(key, timeoutMs) {
 }
 
 module.exports = {
-  isRateLimited
+  isRateLimited,
 };

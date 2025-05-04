@@ -1,6 +1,6 @@
 let client = null;
-const config = require('../config/config.json');
-const { isRateLimited } = require('./rateLimiter'); // ✅ Add this
+const config = require("../config/config.json");
+const { isRateLimited } = require("./rateLimiter"); // ✅ Add this
 
 function registerClient(discordClient) {
   client = discordClient;
@@ -19,11 +19,11 @@ async function sendAlert(content) {
 
     await channel.send(content);
   } catch (err) {
-    console.error('⚠️ Failed to send alert:', err.message);
+    console.error("⚠️ Failed to send alert:", err.message);
   }
 }
 
 module.exports = {
   registerClient,
-  sendAlert
+  sendAlert,
 };

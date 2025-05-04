@@ -1,15 +1,15 @@
-const fs = require('fs');
-const path = require('path');
-const logger = require('../utils/logger');
-const spamFilter = require('../security/spamFilter');
-const { addXp } = require('../utils/levelSystem');
-const config = require('../config/config.json');
+const fs = require("fs");
+const path = require("path");
+const logger = require("../utils/logger");
+const spamFilter = require("../security/spamFilter");
+const { addXp } = require("../utils/levelSystem");
+const config = require("../config/config.json");
 
 const cooldown = new Set();
 const commands = new Map();
 
 // 🔄 Load all message-based (!command) handlers
-const commandFiles = fs.readdirSync(path.join(__dirname, '../commands'));
+const commandFiles = fs.readdirSync(path.join(__dirname, "../commands"));
 for (const file of commandFiles) {
   const command = require(`../commands/${file}`);
   if (command.name) {
@@ -23,17 +23,26 @@ module.exports = async (client, message) => {
   // ✅ Optional XP system with cooldown and randomness
   if (config.rankingSystem?.enabled) {
     const key = `${message.guild.id}-${message.author.id}`;
-    
+
     if (!cooldown.has(key) && message.content.length >= 5) {
       // 🔢 Grant random XP between 10–17
       const xp = Math.floor(Math.random() * 8) + 10;
-      const result = await addXp(message.author.id, message.guild.id, xp, client);
+      const result = await addXp(
+        message.author.id,
+        message.guild.id,
+        xp,
+        client
+      );
 
       // 🎉 If leveled up, announce it
       if (result.leveledUp) {
-        message.channel.send(`🎉 ${message.author} reached **level ${result.level}**!`).catch(() => {});
+        message.channel
+          .send(`🎉 ${message.author} reached **level ${result.level}**!`)
+          .catch(() => {});
         if (result.reward) {
-          message.channel.send(`🏅 Awarded role: **${result.reward}**`).catch(() => {});
+          message.channel
+            .send(`🏅 Awarded role: **${result.reward}**`)
+            .catch(() => {});
         }
       }
 
@@ -47,7 +56,7 @@ module.exports = async (client, message) => {
   await spamFilter(message);
 
   // ⚠️ Only respond to message-based commands (!command)
-  if (!message.content.startsWith('!')) return;
+  if (!message.content.startsWith("!")) return;
 
   const args = message.content.slice(1).trim().split(/ +/);
   const cmdName = args.shift().toLowerCase();
@@ -59,6 +68,8 @@ module.exports = async (client, message) => {
     await command.execute(message, args);
   } catch (err) {
     logger.error(`❌ Error running command '${cmdName}':`, err);
-    message.reply('⚠️ There was an error executing that command.').catch(() => {});
+    message
+      .reply("⚠️ There was an error executing that command.")
+      .catch(() => {});
   }
 };

@@ -1,27 +1,24 @@
-const {
-  SlashCommandBuilder,
-  PermissionFlagsBits
-} = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 
 const {
   buildAntiRaidEmbed,
   buildSpamFilterEmbed,
-  buildRankingEmbed
-} = require('../utils/buildConfigEmbed');
+  buildRankingEmbed,
+} = require("../utils/buildConfigEmbed");
 
 const {
   buildAntiRaidButtons,
   buildSpamFilterButtons,
   buildRankingButtons,
-  buildUtilityButtons
-} = require('../utils/buildConfigButtons');
+  buildUtilityButtons,
+} = require("../utils/buildConfigButtons");
 
-const config = require('../config/config.json');
+const config = require("../config/config.json");
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('config')
-    .setDescription('Open Cain’s interactive config panel.')
+    .setName("config")
+    .setDescription("Open Cain’s interactive config panel.")
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
   async execute(interaction) {
@@ -35,15 +32,15 @@ module.exports = {
     const rankingEmbed = buildRankingEmbed(ranking, config.rankRoles);
 
     return interaction.reply({
-      content: '⚙️ Cain Config Panel',
+      content: "⚙️ Cain Config Panel",
       embeds: [antiRaidEmbed, spamFilterEmbed, rankingEmbed],
       components: [
         ...buildAntiRaidButtons(),
         ...buildSpamFilterButtons(),
         ...buildRankingButtons(),
-        ...buildUtilityButtons()
+        ...buildUtilityButtons(),
       ],
-      ephemeral: true
+      ephemeral: true,
     });
-  }
+  },
 };

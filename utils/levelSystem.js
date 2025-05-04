@@ -1,21 +1,21 @@
-const fs = require('fs');
-const path = require('path');
-const xpPath = path.join(__dirname, '../data/xp.json');
+const fs = require("fs");
+const path = require("path");
+const xpPath = path.join(__dirname, "../data/xp.json");
 
 let xpData = {};
 try {
-  const raw = fs.readFileSync(xpPath, 'utf8');
+  const raw = fs.readFileSync(xpPath, "utf8");
   xpData = raw ? JSON.parse(raw) : {};
 } catch (err) {
-  console.error('⚠️ Failed to load xp.json in levelSystem.js:', err);
+  console.error("⚠️ Failed to load xp.json in levelSystem.js:", err);
   xpData = {};
 }
 
 let config = {};
 try {
-  config = require('../config/config.json');
+  config = require("../config/config.json");
 } catch (err) {
-  console.warn('⚠️ Could not load rank role config.');
+  console.warn("⚠️ Could not load rank role config.");
 }
 
 // 📈 Level formula: basic square root scaling
@@ -25,7 +25,7 @@ function getLevelFromXp(xp) {
 
 // 💾 Save XP data to disk
 function saveXpData() {
-  fs.writeFileSync(xpPath, JSON.stringify(xpData, null, 2), 'utf8');
+  fs.writeFileSync(xpPath, JSON.stringify(xpData, null, 2), "utf8");
 }
 
 // 🧠 Main XP add + levelup logic
@@ -54,15 +54,15 @@ async function addXp(userId, guildId, amount = 10, client = null) {
         const roleName = config.rankRoles[String(newLevel)];
 
         if (roleName) {
-          let role = guild.roles.cache.find(r => r.name === roleName);
+          let role = guild.roles.cache.find((r) => r.name === roleName);
 
           // 🛠️ Auto-create role if missing and allowed
           if (!role && config.autoCreateRankRoles) {
             try {
               role = await guild.roles.create({
                 name: roleName,
-                color: 'Random',
-                reason: `Auto-created by Cain for level ${newLevel}`
+                color: "Random",
+                reason: `Auto-created by Cain for level ${newLevel}`,
               });
               console.log(`🛠️ Created missing role: ${roleName}`);
             } catch (err) {
@@ -95,5 +95,5 @@ function getUserStats(userId, guildId) {
 module.exports = {
   addXp,
   getUserStats,
-  getLevelFromXp
+  getLevelFromXp,
 };
