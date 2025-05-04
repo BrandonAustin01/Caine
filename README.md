@@ -1,4 +1,4 @@
-## README.md
+![Caine Logo Final-01](https://github.com/user-attachments/assets/16005504-35ce-48c8-b5c0-ac98947155f0)
 
 <h1 align="center">🛡️ Caine — The Guardian of Your Discord</h1>
 
@@ -81,10 +81,16 @@ node index.js
 
 ```json
 "rankRoles": {
+  "3": "📘 Newbie",
   "5": "🟢 Rookie",
   "10": "🔵 Member",
+  "15": "🟣 Contributor",
   "20": "🟡 Veteran",
-  "50": "💠 Champion"
+  "30": "🔴 Elite",
+  "40": "⚪ Expert",
+  "50": "💠 Champion",
+  "60": "🔥 Legend",
+  "75": "👑 Master"
 }
 ```
 
