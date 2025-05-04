@@ -18,8 +18,10 @@ module.exports = {
         .setName("user")
         .setDescription("The member to unmute")
         .setRequired(true)
-    )
-    .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers),
+    ),
+
+  category: "Moderation", // or 'Configuration', 'Ranking', etc.
+  adminOnly: true, // if admin-gated
 
   async execute(interaction) {
     const target = interaction.options.getUser("user");

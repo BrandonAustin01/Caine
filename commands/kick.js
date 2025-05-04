@@ -22,8 +22,10 @@ module.exports = {
         .setName("reason")
         .setDescription("Reason for the kick")
         .setRequired(false)
-    )
-    .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers),
+    ),
+
+  category: "Moderation", // or 'Configuration', 'Ranking', etc.
+  adminOnly: true, // if admin-gated
 
   async execute(interaction) {
     const target = interaction.options.getUser("user");

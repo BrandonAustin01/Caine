@@ -22,8 +22,10 @@ module.exports = {
         .setName("reason")
         .setDescription("Reason for unbanning the user")
         .setRequired(false)
-    )
-    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
+    ),
+
+  category: "Moderation", // or 'Configuration', 'Ranking', etc.
+  adminOnly: true, // if admin-gated
 
   async execute(interaction) {
     const userId = interaction.options.getString("userid");

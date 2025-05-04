@@ -21,7 +21,7 @@ module.exports = async function spamFilter(message) {
   const recent = userMessages.filter((ts) => now - ts < config.intervalMs);
   messageCache.set(key, recent);
 
-  // Flood detection
+  // 🚨 Flood detection
   if (recent.length >= config.maxMessages) {
     const logMsg = `📣 Spam detected: ${message.author.tag} (${
       message.author.id
@@ -55,5 +55,37 @@ module.exports = async function spamFilter(message) {
     }
 
     messageCache.set(key, []); // reset after punishment
+    return;
+  }
+
+  // 🚫 Mass Mention Detection
+  const mentionCount =
+    message.mentions.users.size +
+    message.mentions.roles.size +
+    (message.mentions.everyone || message.mentions.here ? 1 : 0);
+
+  if (config.blockMassMentions && mentionCount >= (config.maxMentions || 5)) {
+    const alert = `🚨 **Mass Mention Blocked** in <#${message.channel.id}> by ${message.author.tag}\nMentions: ${mentionCount}`;
+
+    if (config.logToSecurity) {
+      logger.warn(
+        `[MassPing] ${message.author.tag} triggered mention protection.`
+      );
+      securityLog.log(alert);
+      sendAlert(alert);
+    }
+
+    try {
+      await message.delete().catch(() => {});
+      await message.channel
+        .send({
+          content: `🚫 ${message.author}, mass mentions are not allowed.`,
+        })
+        .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 5000));
+    } catch (err) {
+      logger.error(`⚠️ Failed to handle mass mention: ${err.message}`);
+    }
+
+    return;
   }
 };

@@ -17,8 +17,10 @@ const pkg = require("../package.json");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("status")
-    .setDescription("View Cain’s security status and system info.")
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+    .setDescription("View Cain’s security status and system info."),
+
+  category: "Security", // or 'Configuration', 'Ranking', etc.
+  adminOnly: false, // if admin-gated
 
   async execute(interaction) {
     const startedAt = versionData.started

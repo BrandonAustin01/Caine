@@ -22,8 +22,10 @@ module.exports = {
         .setName("reason")
         .setDescription("Reason for the ban")
         .setRequired(false)
-    )
-    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
+    ),
+
+  category: "Moderation", // or 'Configuration', 'Ranking', etc.
+  adminOnly: true, // if admin-gated
 
   category: "Security", // or 'Configuration', 'Ranking', etc.
   adminOnly: true, // if admin-gated

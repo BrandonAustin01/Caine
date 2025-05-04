@@ -14,8 +14,10 @@ module.exports = {
         .setName("userid")
         .setDescription("The ID of the banned user")
         .setRequired(true)
-    )
-    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
+    ),
+
+  category: "Security", // or 'Configuration', 'Ranking', etc.
+  adminOnly: false, // if admin-gated
 
   async execute(interaction) {
     const userId = interaction.options.getString("userid");

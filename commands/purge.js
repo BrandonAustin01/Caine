@@ -23,8 +23,10 @@ module.exports = {
         .setName("target")
         .setDescription("Only delete messages from this user")
         .setRequired(false)
-    )
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
+    ),
+
+  category: "Moderation", // or 'Configuration', 'Ranking', etc.
+  adminOnly: true, // if admin-gated
 
   async execute(interaction) {
     const amount = interaction.options.getInteger("amount");

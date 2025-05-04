@@ -23,6 +23,9 @@ module.exports = {
     .setDescription("Show all available commands and features.")
     .setDMPermission(true),
 
+  category: "Utility", // or 'Configuration', 'Ranking', etc.
+  adminOnly: false, // if admin-gated
+
   async execute(interaction) {
     const isAdmin = interaction.memberPermissions?.has(
       PermissionFlagsBits.Administrator

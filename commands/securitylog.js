@@ -9,7 +9,6 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("securitylog")
     .setDescription("View or clear the security log.")
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addSubcommand((sub) =>
       sub
         .setName("last")
@@ -25,6 +24,9 @@ module.exports = {
     .addSubcommand((sub) =>
       sub.setName("clear").setDescription("Clear the security log")
     ),
+
+  category: "Security", // or 'Configuration', 'Ranking', etc.
+  adminOnly: true, // if admin-gated
 
   async execute(interaction) {
     if (isRateLimited(interaction.user.id, 5000)) {

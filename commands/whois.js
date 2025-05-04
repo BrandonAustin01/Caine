@@ -19,8 +19,10 @@ module.exports = {
         .setName("user")
         .setDescription("The user to lookup")
         .setRequired(true)
-    )
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+    ),
+
+  category: "Security", // or 'Configuration', 'Ranking', etc.
+  adminOnly: false, // if admin-gated
 
   async execute(interaction) {
     const user = interaction.options.getUser("user");

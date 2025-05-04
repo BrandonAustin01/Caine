@@ -1,10 +1,19 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const fs = require("fs");
 const path = require("path");
+
 const config = require("../config/config.json");
 const xpPath = path.join(__dirname, "../data/xp.json");
-const { addXp, getUserStats, getLevelFromXp } = require("../utils/levelSystem");
+const {
+  addXp,
+  getUserStats,
+  getLevelFromXp,
+  getXpToNextLevel,
+  getXpForLevel,
+} = require("../utils/levelSystem");
+
 const requireRankingEnabled = require("../utils/requireRankingEnabled");
+const refreshXpCache = require("../utils/refreshXpCache");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -125,6 +134,9 @@ module.exports = {
         )
     ),
 
+  category: "Ranking",
+  adminOnly: true,
+
   async execute(interaction) {
     const sub = interaction.options.getSubcommand();
     const group = interaction.options.getSubcommandGroup(false);
@@ -132,15 +144,15 @@ module.exports = {
     // /rank view
     if (!group && sub === "view") {
       if (!requireRankingEnabled(interaction)) return;
+
       const user = interaction.options.getUser("user") || interaction.user;
       const stats = getUserStats(user.id, interaction.guild.id);
-      const nextLevel = stats.level + 1;
-      const xpForNext = Math.ceil(nextLevel ** 2 * 10);
+      const xpRemaining = getXpToNextLevel(user.id, interaction.guild.id);
 
-      // Rank title
       const rankLevels = Object.keys(config.rankRoles || {})
         .map(Number)
         .sort((a, b) => a - b);
+
       let title = "Unranked";
       for (const lvl of rankLevels) {
         if (stats.level >= lvl) title = config.rankRoles[lvl];
@@ -153,11 +165,7 @@ module.exports = {
         .addFields(
           { name: "📊 Level", value: `${stats.level}`, inline: true },
           { name: "🔢 Total XP", value: `${stats.xp}`, inline: true },
-          {
-            name: "⏭️ XP to Next",
-            value: `${xpForNext - stats.xp}`,
-            inline: true,
-          },
+          { name: "⏭️ XP to Next", value: `${xpRemaining}`, inline: true },
           { name: "🏷️ Rank Title", value: title, inline: false }
         )
         .setFooter({ text: "Cain • Ranking System" })
@@ -166,7 +174,6 @@ module.exports = {
       return interaction.reply({ embeds: [embed] });
     }
 
-    // ✅ ADMIN COMMANDS BELOW
     if (!interaction.member.permissions.has("Administrator")) {
       return interaction.reply({ content: "❌ Admin only.", ephemeral: true });
     }
@@ -176,16 +183,16 @@ module.exports = {
     const levels = interaction.options.getInteger("levels");
     const guildId = interaction.guild.id;
     const xpData = require("../data/xp.json");
+
     if (!xpData[guildId]) xpData[guildId] = {};
     if (!xpData[guildId][user.id])
       xpData[guildId][user.id] = { xp: 0, level: 0 };
 
-    const fs = require("fs");
-
     // /rank admin setxp
     if (sub === "setxp") {
-      xpData[guildId][user.id].xp = amount;
+      xpData[guildId][user.id].xp = Math.max(0, amount);
       fs.writeFileSync(xpPath, JSON.stringify(xpData, null, 2));
+      refreshXpCache(guildId);
       await addXp(user.id, guildId, 0, interaction.client);
       return interaction.reply({
         content: `✅ Set XP to \`${amount}\` for ${user.tag}.`,
@@ -196,6 +203,7 @@ module.exports = {
     // /rank admin addxp
     if (sub === "addxp") {
       const result = await addXp(user.id, guildId, amount, interaction.client);
+      refreshXpCache(guildId);
       const stats = getUserStats(user.id, guildId);
       return interaction.reply({
         content:
@@ -211,6 +219,7 @@ module.exports = {
     if (sub === "reset") {
       xpData[guildId][user.id] = { xp: 0, level: 0 };
       fs.writeFileSync(xpPath, JSON.stringify(xpData, null, 2));
+      refreshXpCache(guildId);
       return interaction.reply({
         content: `♻️ Reset XP and level for ${user.tag}.`,
         ephemeral: true,
@@ -220,16 +229,17 @@ module.exports = {
     // /rank admin removerole
     if (sub === "removerole") {
       const stats = getUserStats(user.id, guildId);
-      const level = stats.level;
       const eligible = Object.keys(config.rankRoles || {})
         .map(Number)
-        .filter((lvl) => level >= lvl)
+        .filter((lvl) => stats.level >= lvl)
         .sort((a, b) => b - a);
-      if (!eligible.length)
+
+      if (!eligible.length) {
         return interaction.reply({
           content: "No eligible rank role to remove.",
           ephemeral: true,
         });
+      }
 
       const roleName = config.rankRoles[eligible[0]];
       const member = await interaction.guild.members
@@ -238,6 +248,7 @@ module.exports = {
       const role = interaction.guild.roles.cache.find(
         (r) => r.name === roleName
       );
+
       if (member && role && member.roles.cache.has(role.id)) {
         await member.roles.remove(role).catch(() => {});
         return interaction.reply({
@@ -256,10 +267,15 @@ module.exports = {
     if (sub === "promote" || sub === "demote") {
       const oldLevel = getUserStats(user.id, guildId).level;
       const newLevel =
-        sub === "promote" ? oldLevel + levels : Math.max(oldLevel - levels, 0);
-      xpData[guildId][user.id].xp = newLevel ** 2 * 100;
+        sub === "promote" ? oldLevel + levels : Math.max(0, oldLevel - levels);
+
+      xpData[guildId][user.id].xp = getXpForLevel(newLevel);
+      xpData[guildId][user.id].level = newLevel;
+
       fs.writeFileSync(xpPath, JSON.stringify(xpData, null, 2));
+      refreshXpCache(guildId);
       await addXp(user.id, guildId, 0, interaction.client);
+
       return interaction.reply({
         content: `🔁 ${sub === "promote" ? "Promoted" : "Demoted"} ${
           user.tag
@@ -273,6 +289,7 @@ module.exports = {
       const stats = getUserStats(user.id, guildId);
       const level = stats.level;
       const xp = stats.xp;
+
       const rankLevels = Object.keys(config.rankRoles || {})
         .map(Number)
         .sort((a, b) => b - a);

@@ -47,8 +47,10 @@ module.exports = {
         .setName("reason")
         .setDescription("Reason for the mute")
         .setRequired(false)
-    )
-    .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers),
+    ),
+
+  category: "Moderation", // or 'Configuration', 'Ranking', etc.
+  adminOnly: true, // if admin-gated
 
   async execute(interaction) {
     const target = interaction.options.getUser("user");

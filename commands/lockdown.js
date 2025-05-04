@@ -14,8 +14,10 @@ module.exports = {
         .setDescription("Enable or disable lockdown mode")
         .setRequired(true)
         .addChoices({ name: "on", value: "on" }, { name: "off", value: "off" })
-    )
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+    ),
+
+  category: "Moderation", // or 'Configuration', 'Ranking', etc.
+  adminOnly: true, // if admin-gated
 
   async execute(interaction) {
     if (isRateLimited(interaction.user.id, 5000)) {

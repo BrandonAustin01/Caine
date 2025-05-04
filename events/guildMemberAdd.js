@@ -1,6 +1,7 @@
 const logger = require("../utils/logger");
 const securityLog = require("../utils/securityLogger");
 const detectRaid = require("../security/raidDetector");
+const checkBotJoin = require("../security/botJoinDetector"); // ✅ New import
 const config = require("../config/config.json").antiRaid;
 const lockdown = require("../utils/lockdownState");
 
@@ -8,7 +9,10 @@ module.exports = async (client, member) => {
   try {
     logger.info(`📥 ${member.user.tag} joined ${member.guild.name}`);
 
-    // 🔐 1. Lockdown check
+    // ✅ 1. Check for unauthorized bot joins
+    await checkBotJoin(client, member);
+
+    // 🔒 2. Lockdown enforcement
     if (lockdown.status()) {
       await member.kick("Lockdown enabled — new joins disabled");
       logger.warn(`🔒 Kicked ${member.user.tag} — server is in lockdown`);
@@ -18,7 +22,7 @@ module.exports = async (client, member) => {
       return;
     }
 
-    // ⏳ 2. Account age check
+    // ⏳ 3. Minimum account age check
     const accountAgeMs = Date.now() - member.user.createdTimestamp;
     const accountAgeMinutes = Math.floor(accountAgeMs / (1000 * 60));
 
@@ -33,7 +37,7 @@ module.exports = async (client, member) => {
       return;
     }
 
-    // 👥 3. Run raid detection logic
+    // 👥 4. Run raid detection
     await detectRaid(client, member);
   } catch (err) {
     logger.error(`⚠️ Error in guildMemberAdd handler:`, err);

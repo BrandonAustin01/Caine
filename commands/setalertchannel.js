@@ -19,8 +19,10 @@ module.exports = {
         .setDescription("Select a text channel for security alerts")
         .addChannelTypes(ChannelType.GuildText)
         .setRequired(true)
-    )
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+    ),
+
+  category: "Configuration", // or 'Configuration', 'Ranking', etc.
+  adminOnly: true, // if admin-gated
 
   async execute(interaction) {
     if (isRateLimited(interaction.user.id, 5000)) {

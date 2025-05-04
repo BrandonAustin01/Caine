@@ -6,6 +6,9 @@ module.exports = {
     .setName("ranks")
     .setDescription("Display all unlockable ranks and the required levels."),
 
+  category: "Ranking", // or 'Configuration', 'Ranking', etc.
+  adminOnly: false, // if admin-gated
+
   async execute(interaction) {
     // Check if rankRoles is configured
     const rankRoles = config.rankRoles;

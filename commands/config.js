@@ -18,8 +18,10 @@ const config = require("../config/config.json");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("config")
-    .setDescription("Open Cain’s interactive config panel.")
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+    .setDescription("Open Cain’s interactive config panel."),
+
+  category: "Configuration", // or 'Configuration', 'Ranking', etc.
+  adminOnly: true, // if admin-gated
 
   async execute(interaction) {
     const antiRaid = config.antiRaid;
