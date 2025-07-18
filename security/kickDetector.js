@@ -48,6 +48,12 @@ module.exports = function detectKickAbuse(
       lockdown.enable();
       logger.warn("🔒 Lockdown auto-enabled due to kick abuse detection.");
       securityLog.log("🔒 Lockdown auto-enabled by antiKickAbuse system.");
+      modLog(
+        "Lockdown",
+        "System",
+        "0",
+        "Auto-lockdown triggered due to abuse detection"
+      );
     }
 
     // 🔄 Reset + cooldown

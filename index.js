@@ -16,6 +16,7 @@ const versionPath = path.join(__dirname, "version.json");
 const versionData = require(versionPath);
 const logger = require("./utils/logger");
 const { registerClient } = require("./utils/sendAlert");
+const { registerClient: registerModLog } = require("./utils/modLogger");
 
 // Create the client first (⚠️ this must come before using `client`)
 const client = new Client({
@@ -84,6 +85,7 @@ client
   .then(() => {
     logger.success("🔑 Login successful!");
     registerClient(client);
+    registerModLog(client);
     loadEvents("events");
   })
   .catch((err) => {

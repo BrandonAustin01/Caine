@@ -38,6 +38,12 @@ module.exports = async function spamFilter(message) {
     try {
       if (config.punishment === "kick" && message.member.kickable) {
         await message.member.kick("Spamming - Auto moderation");
+        modLog(
+          "Kick",
+          member.user.tag,
+          member.user.id,
+          "Spam filter triggered"
+        );
         logger.warn(`👢 Kicked ${message.author.tag} for spamming`);
         securityLog.log(`👢 Auto-kick: ${message.author.tag} for spamming`);
       } else if (config.punishment === "mute") {
@@ -46,6 +52,12 @@ module.exports = async function spamFilter(message) {
         );
         if (muteRole) {
           await message.member.roles.add(muteRole);
+          modLog(
+            "Mute",
+            member.user.tag,
+            member.user.id,
+            "Spam filter triggered"
+          );
           logger.warn(`🔇 Muted ${message.author.tag} for spamming`);
           securityLog.log(`🔇 Auto-mute: ${message.author.tag} for spamming`);
         }

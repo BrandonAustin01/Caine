@@ -56,12 +56,14 @@ module.exports = async function detectRaid(client, member) {
 
         if (config.punishment === "kick") {
           await m.kick("Anti-raid system");
+          modLog("Kick", member.user.tag, member.user.id, "Anti-raid system");
           logger.warn(`👢 Kicked ${m.user.tag} (raid detected)`);
           securityLog.log(
             `👢 Raid kick: ${m.user.tag} in ${member.guild.name}`
           );
         } else if (config.punishment === "ban") {
           await m.ban({ reason: "Anti-raid system" });
+          modLog("Ban", member.user.tag, member.user.id, "Anti-raid system");
           logger.warn(`🔨 Banned ${m.user.tag} (raid detected)`);
           securityLog.log(`🔨 Raid ban: ${m.user.tag} in ${member.guild.name}`);
         }

@@ -31,6 +31,12 @@ module.exports = function detectWebhookAbuse(guildId, executorTag) {
     if (!lockdown.status()) {
       lockdown.enable();
       logger.error("🔒 Lockdown triggered due to webhook abuse.");
+      modLog(
+        "Lockdown",
+        "System",
+        "0",
+        "Auto-lockdown triggered due to abuse detection"
+      );
       securityLog.log("🔒 Lockdown triggered — webhook creation flood.");
       sendAlert(`🔒 **Cain Lockdown**: Excessive webhook creation detected.`);
     }

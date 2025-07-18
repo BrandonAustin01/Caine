@@ -31,10 +31,22 @@ module.exports = async function checkBotJoin(client, member) {
     try {
       if (action === "kick" && member.kickable) {
         await member.kick("Unauthorized bot (antiBotJoins)");
+        modLog(
+          "Kick",
+          member.user.tag,
+          member.user.id,
+          "Unauthorized bot detected"
+        );
         logger.warn(`👢 Kicked bot ${tag}`);
         securityLog.log(`👢 Auto-kick: Bot ${tag} in ${guildName}`);
       } else if (action === "ban") {
         await member.ban({ reason: "Unauthorized bot (antiBotJoins)" });
+        modLog(
+          "Ban",
+          member.user.tag,
+          member.user.id,
+          "Unauthorized bot detected"
+        );
         logger.warn(`🔨 Banned bot ${tag}`);
         securityLog.log(`🔨 Auto-ban: Bot ${tag} in ${guildName}`);
       }

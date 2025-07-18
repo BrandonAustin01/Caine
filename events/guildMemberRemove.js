@@ -2,6 +2,7 @@ const securityLog = require("../utils/securityLogger");
 const logger = require("../utils/logger");
 const detectKickAbuse = require("../security/kickDetector");
 const { AuditLogEvent } = require("discord.js");
+const { modLog } = require("../utils/modLogger");
 
 module.exports = async (client, member) => {
   setTimeout(async () => {
@@ -30,6 +31,7 @@ module.exports = async (client, member) => {
       const message = `👢 Kick recorded: ${user.tag} (${user.id}) was kicked by ${moderator} — Reason: ${reason}`;
       logger.warn(message);
       securityLog.log(message);
+      modLog("Kick", user.tag, user.id, reason);
 
       detectKickAbuse(guild.id, user, moderator);
     } catch (err) {

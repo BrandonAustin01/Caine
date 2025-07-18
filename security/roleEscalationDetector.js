@@ -35,6 +35,12 @@ module.exports = function detectRoleEscalation(guildId, roleName, perms) {
       lockdown.enable();
       logger.error(`🔒 Lockdown triggered due to multiple role escalations`);
       securityLog.log(`🔒 Lockdown triggered due to role escalation abuse`);
+      modLog(
+        "Lockdown",
+        "System",
+        "0",
+        "Auto-lockdown triggered due to abuse detection"
+      );
       sendAlert(
         `🔒 **Cain Lockdown**: Multiple role updates detected with dangerous permissions.`
       );
